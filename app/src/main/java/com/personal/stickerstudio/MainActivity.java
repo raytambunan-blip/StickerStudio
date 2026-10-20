@@ -51,7 +51,7 @@ public class MainActivity extends Activity {
       try{startActivityForResult(i,2);}catch(Exception e){showToast("WhatsApp tidak ditemukan");}
     });
     main.addView(text("Minimal 3 stiker untuk ekspor. Tekan lama stiker untuk menghapus.",13));
-    main.addView(text("Editor foto v1.1: crop, teks, hapus background warna serupa. Semua offline.",13));
+    main.addView(text("Editor foto v1.2: crop, teks, hapus background AI. Semua offline.",13));
     setContentView(sc);
   }
   @Override protected void onActivityResult(int request,int result,Intent data){

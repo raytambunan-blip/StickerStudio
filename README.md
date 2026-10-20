@@ -1,17 +1,24 @@
-# Sticker Studio (Android, pribadi)
+# Sticker Studio v1.2 — AI Hapus Background (Offline)
 
-Aplikasi pembuat stiker WhatsApp offline dan bebas iklan.
+Sticker Studio sekarang memiliki tombol HAPUS BACKGROUND AI (OFFLINE) untuk memotong objek utama (manusia, barang, hewan) dengan model Silueta/U²-Net. Foto tidak pernah dikirim ke internet.
 
-## v1.1 Editor Foto
-- Crop: geser empat sudut kotak crop, klik **Terapkan Crop**.
-- Teks: klik **Teks**, masukkan kalimat, lalu geser tulisan langsung di atas foto. Sesuaikan warna dan ukuran.
-- Hapus BG: klik **Hapus BG**, lalu ketuk warna latar foto. Atur slider toleransi dan ulangi jika diperlukan. Penghapusan menggunakan flood-fill warna serupa, **bukan** segmentasi AI/otomatis untuk latar kompleks.
-- Undo, simpan WebP 512x512, koleksi sampai 30, ekspor paket ke WhatsApp.
+Fitur lama tetap ada: crop, teks yang bisa digeser, warna teks, hapus BG manual berdasarkan warna, Undo, penyimpanan WebP stiker WhatsApp.
 
-## Membuat APK tanpa laptop
-Repository -> Actions -> **Build StickerStudio APK** -> pilih run hijau -> Artifacts -> **StickerStudio-APK** -> ekstrak ZIP -> instal app-debug.apk.
+## Cara menggunakan
+1. Ketuk Pilih foto untuk diedit.
+2. Tekan HAPUS BACKGROUND AI (OFFLINE). Tunggu mesin ONNX menyelesaikan pemrosesan di HP.
+3. Lanjutkan crop/teks atau Undo. Simpan stiker.
 
-### Penting tentang update APK
-Build debug GitHub di-runner baru mungkin memakai sertifikat tanda tangan berbeda. Jika instalasi berbunyi "App not installed" karena tanda tangan tidak cocok, Android meminta **hapus versi lama terlebih dahulu**. Menghapus aplikasi juga akan menghapus koleksi stiker lokal. Simpan foto aslinya sebelum menghapus.
+## Teknis
+- AI: silueta.onnx (sekitar 43 MB), referensi https://github.com/danielgatis/rembg.
+- Mesin lokal: com.microsoft.onnxruntime:onnxruntime-android:1.28.0.
+- Model diunduh oleh GitHub Actions pada saat build (BUKAN saat digunakan), diverifikasi MD5 sebagaimana upstream rembg.
+- Semua proses hapus BG AI dilakukan on-device dan gratis. APK lebih besar karena menyertakan bobot model.
+- Hasil AI tidak dijamin sempurna pada rambut halus, objek transparan, objek jamak, atau foto yang rumit.
 
-Fitur video animasi dan penghapusan background AI belum tersedia.
+## APK baru
+Buka https://github.com/raytambunan-blip/StickerStudio/actions, pilih run terbaru hijau dan unduh Artifacts StickerStudio-APK. Ekstrak APK.
+
+PERINGATAN: Sertifikat debug pada GitHub runner dapat berubah tiap build. Jika Android tidak bisa memperbarui, perlu menghapus versi lama; uninstall akan menghapus stiker lokal. Simpan foto asli sebelum uninstall.
+
+Pengolahan video animasi belum termasuk versi ini.
