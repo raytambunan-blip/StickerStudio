@@ -49,13 +49,17 @@ public class EditorActivity extends Activity {
     TextView header=label("✦ EDIT STIKER",20);header.setTextColor(Color.rgb(188,172,255));root.addView(header);
     preview=new EditorView(this);
     root.addView(preview,new LinearLayout.LayoutParams(-1,0,1));
+    Button aiButton=btn("✨ HAPUS BACKGROUND AI (OFFLINE)");
+    aiButton.setTextColor(PURPLE);
+    root.addView(aiButton,new LinearLayout.LayoutParams(-1,dp(54)));
+    aiButton.setOnClickListener(v->removeBackgroundAI());
     hint=label("Memuat foto...",13);root.addView(hint);
     HorizontalScrollView scroll=new HorizontalScrollView(this);scroll.setHorizontalScrollBarEnabled(false);
     LinearLayout tools=new LinearLayout(this);tools.setOrientation(LinearLayout.HORIZONTAL);scroll.addView(tools);
     Button cropB=btn("✂ Crop");tools.addView(cropB);
     Button textB=btn("Teks");tools.addView(textB);
     Button colorB=btn("Warna Teks");tools.addView(colorB);
-    Button bgB=btn("Hapus BG");tools.addView(bgB);
+    Button bgB=btn("BG Manual");tools.addView(bgB);
     Button undoB=btn("↶ Undo");tools.addView(undoB);
     root.addView(scroll);
     cropPanel=new LinearLayout(this);cropPanel.setOrientation(LinearLayout.HORIZONTAL);
@@ -208,6 +212,39 @@ public class EditorActivity extends Activity {
           preview.invalidate();hint.setText("Background dihapus ("+n+" piksel). Ketuk area lain bila perlu.");
         });
       }catch(Exception e){runOnUiThread(()->{busy=false;saveButton.setEnabled(true);toast(e.getMessage());setMode(BACKGROUND);});}
+    }).start();
+  }
+
+  private void removeBackgroundAI(){
+    if(image==null||busy)return;
+    final Bitmap original=image;
+    busy=true;saveButton.setEnabled(false);
+    hint.setText("AI mengenali objek... Mohon tunggu beberapa detik.");
+    new Thread(()->{
+      try{
+        Bitmap edited=AiBackgroundRemover.remove(this,original);
+        runOnUiThread(()->{
+          if(isFinishing()||isDestroyed()){edited.recycle();return;}
+          busy=false;saveUndo();
+          image=edited;resetCrop();setMode(TEXT);
+          hint.setText("Background AI sudah dihapus. Gunakan Undo jika perlu.");
+          saveButton.setEnabled(true);preview.invalidate();
+        });
+      }catch(Exception e){
+        runOnUiThread(()->{
+          if(isFinishing()||isDestroyed())return;
+          busy=false;saveButton.setEnabled(true);
+          hint.setText("AI gagal. Coba ulangi atau pakai penghapus BG Manual.");
+          toast("AI gagal: "+(e.getMessage()==null?e.getClass().getSimpleName():e.getMessage()));
+        });
+      }catch(UnsatisfiedLinkError e){
+        runOnUiThread(()->{
+          if(isFinishing()||isDestroyed())return;
+          busy=false;saveButton.setEnabled(true);
+          hint.setText("Mesin AI tidak kompatibel dengan perangkat ini.");
+          toast("Mesin AI ONNX gagal dimuat di perangkat.");
+        });
+      }
     }).start();
   }
   private void drawText(Canvas canvas,int w,int h){
