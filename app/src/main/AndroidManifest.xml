@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<queries><package android:name="com.whatsapp" /></queries>
+<application android:allowBackup="false" android:label="Sticker Studio" android:theme="@style/AppTheme" android:usesCleartextTraffic="false">
+<activity android:name=".MainActivity" android:exported="true"><intent-filter>
+<action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/>
+</intent-filter></activity>
+<provider android:name=".StickerProvider" android:authorities="com.personal.stickerstudio.provider" android:exported="true" android:readPermission="com.whatsapp.sticker.READ"/>
+</application>
+</manifest>
