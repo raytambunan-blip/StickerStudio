@@ -204,7 +204,7 @@ public class EditorActivity extends Activity {
         out.setPixels(pixels,0,w,0,0,w,h);
         int n=removed;
         runOnUiThread(()->{
-          saveUndo();image=out;busy=false;saveButton.setEnabled(true);
+          busy=false;saveUndo();image=out;saveButton.setEnabled(true);
           preview.invalidate();hint.setText("Background dihapus ("+n+" piksel). Ketuk area lain bila perlu.");
         });
       }catch(Exception e){runOnUiThread(()->{busy=false;saveButton.setEnabled(true);toast(e.getMessage());setMode(BACKGROUND);});}
