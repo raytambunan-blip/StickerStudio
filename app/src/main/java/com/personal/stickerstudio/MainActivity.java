@@ -21,6 +21,49 @@ public class MainActivity extends Activity {
   Button button(String s){Button b=new Button(this);b.setText(s);b.setAllCaps(false);return b;}
   void showToast(String s){Toast.makeText(this,s,Toast.LENGTH_LONG).show();}
   @Override public void onCreate(Bundle b){super.onCreate(b);draw();}
+
+  private File animationFolder(){
+    File d=new File(getFilesDir(),"stickers/animasi_pribadi");
+    d.mkdirs();return d;
+  }
+  private File[] animations(){
+    File[] a=animationFolder().listFiles((d,n)->n.endsWith(".webp"));
+    if(a==null)return new File[0];Arrays.sort(a);return a;
+  }
+  private void pickAnimated(String type,int code){
+    Intent i=new Intent(Intent.ACTION_OPEN_DOCUMENT);
+    i.setType(type);i.addCategory(Intent.CATEGORY_OPENABLE);
+    startActivityForResult(i,code);
+  }
+  private void animatedSection(LinearLayout layout){
+    File[] items=animations();
+    layout.addView(text("Stiker Bergerak: "+items.length+"/30",19));
+    LinearLayout row=new LinearLayout(this);row.setOrientation(LinearLayout.HORIZONTAL);
+    HorizontalScrollView hs=new HorizontalScrollView(this);hs.addView(row);layout.addView(hs);
+    for(File f:items){
+      ImageView iv=new ImageView(this);
+      iv.setLayoutParams(new LinearLayout.LayoutParams(dp(94),dp(94)));
+      iv.setScaleType(ImageView.ScaleType.FIT_CENTER);
+      Bitmap first=BitmapFactory.decodeFile(f.getPath());
+      if(first!=null)iv.setImageBitmap(first);
+      row.addView(iv);
+      iv.setOnLongClickListener(v->{
+        new AlertDialog.Builder(this).setTitle("Hapus stiker bergerak?")
+        .setNegativeButton("Batal",null).setPositiveButton("Hapus",(d,w)->{
+          if(f.delete()){getContentResolver().notifyChange(Uri.parse("content://"+AUTH+"/metadata"),null);draw();}
+        }).show();return true;
+      });
+    }
+    Button add=button("Tambahkan Paket Animasi ke WhatsApp");
+    add.setEnabled(items.length>=3);layout.addView(add);
+    add.setOnClickListener(v->{
+      Intent i=new Intent("com.whatsapp.intent.action.ENABLE_STICKER_PACK");
+      i.putExtra("sticker_pack_id","animasi_pribadi");
+      i.putExtra("sticker_pack_authority",AUTH);
+      i.putExtra("sticker_pack_name","Stiker Bergerak");
+      try{startActivityForResult(i,2);}catch(Exception e){showToast("WhatsApp tidak ditemukan");}
+    });
+  }
   void draw(){
     ScrollView sc=new ScrollView(this);sc.setBackgroundColor(Color.rgb(247,246,252));
     LinearLayout main=new LinearLayout(this);main.setOrientation(1);
@@ -33,6 +76,11 @@ public class MainActivity extends Activity {
       Intent i=new Intent(Intent.ACTION_OPEN_DOCUMENT);i.setType("image/*");
       i.addCategory(Intent.CATEGORY_OPENABLE);startActivityForResult(i,1);
     });
+
+    Button video=button("▶ Buat stiker bergerak dari VIDEO");main.addView(video);
+    video.setOnClickListener(v->pickAnimated("video/*",10));
+    Button gif=button("◉ Buat stiker bergerak dari GIF");main.addView(gif);
+    gif.setOnClickListener(v->pickAnimated("image/gif",11));
     File[] files=stickers();main.addView(text("Koleksi stiker: "+files.length+"/30",19));
     LinearLayout row=new LinearLayout(this);row.setOrientation(LinearLayout.HORIZONTAL);
     HorizontalScrollView hs=new HorizontalScrollView(this);hs.addView(row);main.addView(hs);
@@ -50,8 +98,9 @@ public class MainActivity extends Activity {
       i.putExtra("sticker_pack_name","Stiker Pribadi");
       try{startActivityForResult(i,2);}catch(Exception e){showToast("WhatsApp tidak ditemukan");}
     });
+    animatedSection(main);
     main.addView(text("Minimal 3 stiker untuk ekspor. Tekan lama stiker untuk menghapus.",13));
-    main.addView(text("Editor foto v1.2: crop, teks, hapus background AI. Semua offline.",13));
+    main.addView(text("v1.3: AI Foto + video/GIF bergerak. Pemrosesan offline.",13));
     setContentView(sc);
   }
   @Override protected void onActivityResult(int request,int result,Intent data){
@@ -60,6 +109,13 @@ public class MainActivity extends Activity {
       if(stickers().length>=30){showToast("Paket sudah berisi 30 stiker");return;}
       Intent edit=new Intent(this,EditorActivity.class);edit.setData(data.getData());
       edit.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);startActivityForResult(edit,3);
-    }else if(request==3)draw();
+
+    }else if((request==10||request==11)&&result==RESULT_OK&&data!=null&&data.getData()!=null){
+      if(animations().length>=30){showToast("Paket animasi penuh");return;}
+      Intent edit=new Intent(this,AnimationActivity.class);edit.setData(data.getData());
+      edit.putExtra("kind",request==11?"gif":"video");
+      edit.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+      startActivityForResult(edit,4);
+    }else if(request==3||request==4)draw();
   }
 }

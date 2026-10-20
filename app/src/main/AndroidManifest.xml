@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 <queries><package android:name="com.whatsapp" /></queries>
 <application android:allowBackup="false" android:label="Sticker Studio" android:theme="@style/AppTheme" android:usesCleartextTraffic="false">
+<activity android:name=".AnimationActivity" android:exported="false"/>
 <activity android:name=".EditorActivity" android:exported="false" android:windowSoftInputMode="adjustResize"/>
 <activity android:name=".MainActivity" android:exported="true"><intent-filter>
 <action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/>

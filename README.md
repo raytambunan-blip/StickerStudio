@@ -1,24 +1,19 @@
-# Sticker Studio v1.2 — AI Hapus Background (Offline)
+# Sticker Studio v1.3
 
-Sticker Studio sekarang memiliki tombol HAPUS BACKGROUND AI (OFFLINE) untuk memotong objek utama (manusia, barang, hewan) dengan model Silueta/U²-Net. Foto tidak pernah dikirim ke internet.
+Private Android WhatsApp sticker maker without ads. Processing takes place on device.
 
-Fitur lama tetap ada: crop, teks yang bisa digeser, warna teks, hapus BG manual berdasarkan warna, Undo, penyimpanan WebP stiker WhatsApp.
+## Static stickers
+Crop, text, remove background offline with Silueta AI (unchanged from v1.2). Separate photo pack.
 
-## Cara menggunakan
-1. Ketuk Pilih foto untuk diedit.
-2. Tekan HAPUS BACKGROUND AI (OFFLINE). Tunggu mesin ONNX menyelesaikan pemrosesan di HP.
-3. Lanjutkan crop/teks atau Undo. Simpan stiker.
+## Animated stickers
+- Pick videos supported by Android, or animated GIF files.
+- Select video start and 1–3 seconds, GIF uses first 1–3 seconds.
+- Android MediaMetadataRetriever or GIF Movie extracts frames (up to 6 fps), scales with transparent padding to 512x512.
+- AnimatedWebp builds a standards-compliant animated WebP RIFF container from Android-compressed WebP frames (RFC 9649).
+- Adaptive quality and FPS to fit within 500,000 bytes. If the video cannot fit, choose a shorter duration.
+- WhatsApp requires at least 3 animated stickers per pack. Animated and static packs cannot mix; use separate buttons.
+- No server; no cloud upload; **AI background removal for animated frames is not included yet**.
 
-## Teknis
-- AI: silueta.onnx (sekitar 43 MB), referensi https://github.com/danielgatis/rembg.
-- Mesin lokal: com.microsoft.onnxruntime:onnxruntime-android:1.28.0.
-- Model diunduh oleh GitHub Actions pada saat build (BUKAN saat digunakan), diverifikasi MD5 sebagaimana upstream rembg.
-- Semua proses hapus BG AI dilakukan on-device dan gratis. APK lebih besar karena menyertakan bobot model.
-- Hasil AI tidak dijamin sempurna pada rambut halus, objek transparan, objek jamak, atau foto yang rumit.
-
-## APK baru
-Buka https://github.com/raytambunan-blip/StickerStudio/actions, pilih run terbaru hijau dan unduh Artifacts StickerStudio-APK. Ekstrak APK.
-
-PERINGATAN: Sertifikat debug pada GitHub runner dapat berubah tiap build. Jika Android tidak bisa memperbarui, perlu menghapus versi lama; uninstall akan menghapus stiker lokal. Simpan foto asli sebelum uninstall.
-
-Pengolahan video animasi belum termasuk versi ini.
+## Install
+GitHub Actions > latest successful build > Artifacts > StickerStudio-APK > extract app-debug.apk.
+Your debug APK signature may differ from previous builds. If Android refuses an update, uninstalling the old app will **delete local sticker collections**.

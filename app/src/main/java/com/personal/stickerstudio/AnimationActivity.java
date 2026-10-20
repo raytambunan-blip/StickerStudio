@@ -122,7 +122,7 @@ public class AnimationActivity extends Activity {
     }).start();
   }
   private void progress(String s){runOnUiThread(()->{if(!isFinishing())status.setText(s);});}
-  private ArrayList<Bitmap> gifFrames(int n,int totalMs)throws IOException{
+  private ArrayList<Bitmap> gifFrames(int n,int totalMs)throws Exception{
     ArrayList<Bitmap> frames=new ArrayList<>();
     try(InputStream in=getContentResolver().openInputStream(sourceUri)){
       Movie gif=Movie.decodeStream(in);
@@ -143,7 +143,7 @@ public class AnimationActivity extends Activity {
     }catch(Exception e){for(Bitmap b:frames)b.recycle();throw e;}
     return frames;
   }
-  private ArrayList<Bitmap> videoFrames(int n,int totalMs)throws IOException{
+  private ArrayList<Bitmap> videoFrames(int n,int totalMs)throws Exception{
     ArrayList<Bitmap> frames=new ArrayList<>();
     MediaMetadataRetriever mm=new MediaMetadataRetriever();
     try{
